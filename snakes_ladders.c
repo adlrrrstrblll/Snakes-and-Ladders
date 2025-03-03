@@ -87,20 +87,19 @@ void displayBoard(int p1, int p2) {
             char *tile = getPositionColor(pos);
 
             if (pos == p1 && pos == p2)
-                printf("12");
+                printf("12 ");
             else if (pos == p1)
-                printf("1 ");
+                printf("1  ");
             else if (pos == p2)
-                printf("2 ");
+                printf("2  ");
             else
-                printf("%s", tile);
+                printf("%s ", tile);
         }
         printf("\n");
     }
 }
 
 int main(){
-
     /*
         player1 and player2 will be set to 0, indicating that
         no one has won, game ends if player 1 OR player 2 wins
@@ -108,6 +107,8 @@ int main(){
     */
     struct Player p1, p2;
     srand(time(NULL));
+
+    system("clear");
 
     int playerTurn = 1; // 1 for p1, 2 for p2
 
@@ -136,9 +137,9 @@ int main(){
     displayBoard(p1.playerPosition, p2.playerPosition);
     printf("\n\nPress Enter to Start\n");
     getchar();
+    system("clear");
 
     while(p1.state == 0 && p2.state == 0){
-
         // Start Turn
         printf("\n");
         if (playerTurn == 1)
@@ -150,6 +151,8 @@ int main(){
 
         int dice = rollDice();
         int newPosition = 0; // New position of the player in case of snake or ladder
+
+        system("clear");
 
         if(playerTurn == 1){
             printf("%s rolled a %d!\n", p1.name, dice);
