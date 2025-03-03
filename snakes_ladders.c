@@ -40,12 +40,6 @@ void generateSnakesAndLadders() {
             d = (rand() % (WINNING_POSITION - 10)) + 2;
         }
 
-        if (s < d) {
-            printf("Ladder:\t%d → %d\t%s\n", s, d, colors[i]);
-        } else {
-            printf("Snake:\t%d → %d\t%s\n", s, d, colors[i]);
-        }
-
         start[i] = s;
         destination[i] = d;
     }
@@ -74,14 +68,25 @@ char *getPositionColor(int position) {
 void displayBoard(int p1, int p2) {
     printf("\n🎲 Snakes and Ladders Board 🎲\n");
 
+    for (int a = 0; a < NUM_SNAKES_LADDERS; a++) {
+        if (start[a] < destination[a]) {
+            printf("Ladder: %2d → %2d %s\n", start[a], destination[a], colors[a]);
+        } else {
+            printf("Snake:  %2d → %2d %s\n", start[a], destination[a], colors[a]);
+        }
+    }
+
+    printf("\n");
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             int pos = (SIZE - 1 - i) * SIZE;
 
             if ((SIZE - 1 - i) % 2 == 0) {
                 pos += j + 1;
+                printf("> ");
             } else {
                 pos += (SIZE - j);
+                printf("< ");
             }
 
             char *tile = getPositionColor(pos);
@@ -107,109 +112,112 @@ int main(){
     */
     struct Player p1, p2;
     srand(time(NULL));
+    int answer = 1;
+    while (answer == 1){
+        system("clear");
+        int playerTurn = 1; // 1 for p1, 2 for p2
 
-    system("clear");
-
-    int playerTurn = 1; // 1 for p1, 2 for p2
-
-    displayTitle();
-    printf("\n");
-
-    printf("Enter Player 1's Name: ");
-    scanf("%s", p1.name);
-    printf("Enter Player 2's Name: ");
-    scanf("%s", p2.name);
-
-    getchar();
-
-    p1.state = 0;
-    p2.state = 0;
-
-    p1.playerPosition = 1;
-    p2.playerPosition = 1;
-
-    printf("🎲🐍 Gameboard 🪜🎲\n");
-    displayBoard(p1.playerPosition, p2.playerPosition);
-    printf("\nBut of Course Snakes and Ladders won't be fun without SNAKES and LADDERS [Click Enter]\n");
-    getchar();
-    generateSnakesAndLadders();
-    printf("\n🎲🐍 UPDATED Gameboard 🪜🎲\n");
-    displayBoard(p1.playerPosition, p2.playerPosition);
-    printf("\n\nPress Enter to Start\n");
-    getchar();
-    system("clear");
-
-    while(p1.state == 0 && p2.state == 0){
-        // Start Turn
+        displayTitle();
         printf("\n");
-        if (playerTurn == 1)
-            printf("%s's turn. Press ENTER to roll the dice...\n", p1.name);
-        else
-            printf("%s's turn. Press ENTER to roll the dice...\n", p2.name);
+
+        printf("Enter Player 1's Name: ");
+        scanf("%s", p1.name);
+        printf("Enter Player 2's Name: ");
+        scanf("%s", p2.name);
 
         getchar();
 
-        int dice = rollDice();
-        int newPosition = 0; // New position of the player in case of snake or ladder
+        p1.state = 0;
+        p2.state = 0;
 
+        p1.playerPosition = 1;
+        p2.playerPosition = 1;
+
+        printf("🎲🐍 Gameboard 🪜🎲\n");
+        generateSnakesAndLadders();
+        displayBoard(p1.playerPosition, p2.playerPosition);
+        printf("\n\nPress Enter to Start\n");
+        getchar();
         system("clear");
 
-        if(playerTurn == 1){
-            printf("%s rolled a %d!\n", p1.name, dice);
+        while(p1.state == 0 && p2.state == 0){
+            // Start Turn
+            printf("\n");
+            if (playerTurn == 1)
+                printf("%s's [1] turn. Press ENTER to roll the dice...\n", p1.name);
+            else
+                printf("%s's [2] turn. Press ENTER to roll the dice...\n", p2.name);
 
-            p1.playerPosition += dice;
-            if(p1.playerPosition >= WINNING_POSITION){
-                p1.playerPosition = WINNING_POSITION;
-                p1.state = 1;
+            getchar();
+
+            int dice = rollDice();
+            int newPosition = 0; // New position of the player in case of snake or ladder
+
+            system("clear");
+
+            if(playerTurn == 1){
+                printf("%s rolled a %d!\n", p1.name, dice);
+
+                p1.playerPosition += dice;
+                if(p1.playerPosition >= WINNING_POSITION){
+                    p1.playerPosition = WINNING_POSITION;
+                    p1.state = 1;
+                }
+
+                newPosition = snakeOrLadder(p1.playerPosition);
+                if (newPosition != 0){
+                    if (newPosition > p1.playerPosition)
+                        printf("🎉 %s [1] climbed a ladder to %d!\n", p1.name, newPosition);
+                    if (newPosition < p1.playerPosition)
+                        printf("🐍 %s [1] was bitten by a snake and fell to %d!\n", p1.name, newPosition);
+                    p1.playerPosition = newPosition;
+
+                    newPosition = 0;
+                }
+
             }
+            else if(playerTurn == 2){
+                printf("%s rolled a %d!\n", p2.name, dice);
+                p2.playerPosition += dice;
+                if(p2.playerPosition >= WINNING_POSITION){
+                    p2.playerPosition = WINNING_POSITION;
+                    p2.state = 1;
+                }
 
-            newPosition = snakeOrLadder(p1.playerPosition);
-            if (newPosition != 0){
-                if (newPosition > p1.playerPosition)
-                    printf("🎉 %s [1] climbed a ladder to %d!\n", p1.name, newPosition);
-                if (newPosition < p1.playerPosition)
-                    printf("🐍 %s [1] was bitten by a snake and fell to %d!\n", p1.name, newPosition);
-                p1.playerPosition = newPosition;
+                newPosition = snakeOrLadder(p2.playerPosition);
+                if (newPosition != 0){
+                    if (newPosition > p2.playerPosition)
+                        printf("🎉 %s [2] climbed a ladder to %d!\n", p2.name, newPosition);
+                    if (newPosition < p2.playerPosition) 
+                        printf("🐍 %s [2] was bitten by a snake and fell to %d!\n", p2.name, newPosition);
+                    p2.playerPosition = newPosition;
 
-                newPosition = 0;
+                    newPosition = 0;
+                }
             }
+            else
+                printf("Debugging Purposes\n");
 
+            displayBoard(p1.playerPosition, p2.playerPosition);
+
+            if (playerTurn == 1)
+
+                playerTurn++;
+            else
+                playerTurn--;
         }
-        else if(playerTurn == 2){
-            printf("%s rolled a %d!\n", p2.name, dice);
-            p2.playerPosition += dice;
-            if(p2.playerPosition >= WINNING_POSITION){
-                p2.playerPosition = WINNING_POSITION;
-                p2.state = 1;
-            }
 
-            newPosition = snakeOrLadder(p2.playerPosition);
-            if (newPosition != 0){
-                if (newPosition > p2.playerPosition)
-                    printf("🎉 %s [2] climbed a ladder to %d!\n", p2.name, newPosition);
-                if (newPosition < p2.playerPosition) 
-                    printf("🐍 %s [2] was bitten by a snake and fell to %d!\n", p2.name, newPosition);
-                p2.playerPosition = newPosition;
+        if (p1.state == 1)
+            printf("%s Wins!\n", p1.name);
+        else
+            printf("%s Wins!\n", p2.name);
 
-                newPosition = 0;
-            }
+        if (p1.state == 1 || p2.state == 1){
+            printf("Do you want to Play Again? [Press 1 to Play Again, Press Any Other Key to Stop]: ");
+            scanf("%d", &answer);
         }
-        else
-            printf("Debugging Purposes\n");
 
-        displayBoard(p1.playerPosition, p2.playerPosition);
-
-        if (playerTurn == 1)
-
-            playerTurn++;
-        else
-            playerTurn--;
     }
-
-    if (p1.state == 1)
-        printf("%s Wins!\n", p1.name);
-    else
-        printf("%s Wins!\n", p2.name);
 
     return 0;
 }
